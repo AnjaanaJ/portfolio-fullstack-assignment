@@ -46,7 +46,7 @@ export default function Projects() {
         setError(requestError.message);
       } finally {
         setLoading(false);
-      }9
+      }
     };
 
     loadProjects();
