@@ -1,4 +1,7 @@
 import mongoose from "mongoose";
+import dns from "node:dns";
+
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 const connectDB = async () => {
   if (!process.env.MONGODB_URI) {
@@ -15,8 +18,7 @@ const connectDB = async () => {
     return true;
   } catch (error) {
     console.error(`MongoDB connection failed: ${error.message}`);
-    console.warn("The API will stay online without a database connection.");
-    return false;
+    process.exit(1);
   }
 };
 
