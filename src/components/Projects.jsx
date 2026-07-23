@@ -1,48 +1,62 @@
-const PROJECTS = [
-  {
-    icon: 'fa-solid fa-cart-shopping',
-    title: 'Sales System',
-    status: 'finished',
-    statusLabel: 'Completed',
-    description:
-      'Desktop application developed using Java and Object-Oriented Programming principles for managing sales operations and business workflows.',
-    stack: [
-      { icon: 'devicon-java-plain', label: 'Java' },
-      { icon: 'fa-solid fa-cubes', label: 'OOP' },
-    ],
-    github: 'https://github.com/AnjaanaJ/SalesSystem',
-  },
-  {
-    icon: 'fa-solid fa-user-graduate',
-    title: 'Student Record Manager',
-    status: 'finished',
-    statusLabel: 'Completed',
-    description:
-      'Java-based application created to manage and organize student records efficiently using structured programming concepts.',
-    stack: [
-      { icon: 'devicon-java-plain', label: 'Java' },
-      { icon: 'fa-solid fa-folder-open', label: 'File Handling' },
-    ],
-    github: 'https://github.com/AnjaanaJ/Student-Record-Manager',
-  },
-  {
-    icon: 'fa-solid fa-car-side',
-    title: 'DriveEASE',
-    status: 'project-active',
-    statusLabel: 'In Progress',
-    description:
-      'Modern web platform for an online driving school featuring responsive UI and full-stack architecture using the MERN stack.',
-    stack: [
-      { icon: 'devicon-mongodb-plain', label: 'MongoDB' },
-      { icon: 'devicon-express-original', label: 'Express' },
-      { icon: 'devicon-react-original', label: 'React' },
-      { icon: 'devicon-nodejs-plain', label: 'Node.js' },
-    ],
-    github: 'https://github.com/AnjaanaJ/driveEASE',
-  },
-];
+import { useEffect, useState } from "react";
+import { getProjects } from "../services/projectService";
+
+const TECHNOLOGY_ICONS = {
+  Java: "devicon-java-plain",
+  OOP: "fa-solid fa-cubes",
+  "File Handling": "fa-solid fa-folder-open",
+  MongoDB: "devicon-mongodb-plain",
+  Express: "devicon-express-original",
+  React: "devicon-react-original",
+  "Node.js": "devicon-nodejs-plain",
+  JavaScript: "devicon-javascript-plain",
+  HTML: "devicon-html5-plain",
+  CSS: "devicon-css3-plain",
+};
+
+const getProjectIcon = (title) => {
+  const normalizedTitle = title.toLowerCase();
+
+  if (normalizedTitle.includes("sales")) {
+    return "fa-solid fa-cart-shopping";
+  }
+
+  if (normalizedTitle.includes("student")) {
+    return "fa-solid fa-user-graduate";
+  }
+
+  if (normalizedTitle.includes("drive")) {
+    return "fa-solid fa-car-side";
+  }
+
+  return "fa-solid fa-code";
+};
 
 export default function Projects() {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        const data = await getProjects();
+        setProjects(data);
+      } catch (requestError) {
+        setError(requestError.message);
+      } finally {
+        setLoading(false);
+      }9
+    };
+
+    loadProjects();
+    window.addEventListener("projectsChanged", loadProjects);
+
+    return () => {
+      window.removeEventListener("projectsChanged", loadProjects);
+    };
+  }, []);
+
   return (
     <section id="projects" className="projects section">
       <div className="section-title">
@@ -50,33 +64,78 @@ export default function Projects() {
         <h2>Featured Work</h2>
       </div>
 
-      <div className="project-grid">
-        {PROJECTS.map((project) => (
-          <article className="project reveal" key={project.title}>
-            <div>
-              <span className={`project-status ${project.status}`}>{project.statusLabel}</span>
-              <div className="project-title">
-                <div className="project-tech-icon">
-                  <i className={project.icon}></i>
+      {loading && <p className="project-message">Loading projects...</p>}
+
+      {!loading && error && (
+        <p className="project-message project-error">{error}</p>
+      )}
+
+      {!loading && !error && projects.length === 0 && (
+        <p className="project-message">No projects have been added yet.</p>
+      )}
+
+      {!loading && !error && projects.length > 0 && (
+        <div className="project-grid">
+          {projects.map((project) => (
+            <article
+              className="project"
+              key={project._id || project.projectLink || project.title}
+            >
+              <div className="project-content">
+                <span
+                  className={`project-status ${
+                    project.status === "Completed"
+                      ? "finished"
+                      : "project-active"
+                  }`}
+                >
+                  <span className="status-dot" aria-hidden="true"></span>
+                  {project.status}
+                </span>
+
+                <div className="project-title">
+                  <div className="project-tech-icon">
+                    <i className={getProjectIcon(project.title)}></i>
+                  </div>
+                  <h3>{project.title}</h3>
                 </div>
-                <h3>{project.title}</h3>
+
+                <p>{project.description}</p>
+
+                <div className="stack">
+                  {project.technologies.map((technology) => (
+                    <span key={technology}>
+                      <i
+                        className={
+                          TECHNOLOGY_ICONS[technology] || "fa-solid fa-code"
+                        }
+                      ></i>
+                      {technology}
+                    </span>
+                  ))}
+                </div>
+
+                {project.projectLink && (
+                  <div className="project-links">
+                    <a
+                      href={project.projectLink}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <i className="fa-brands fa-github" aria-hidden="true"></i>
+                      <span>View Project</span>
+                      <i
+                        className="fa-solid fa-arrow-up-right-from-square project-link-arrow"
+                        aria-hidden="true"
+                      ></i>
+                    </a>
+                  </div>
+                )}
               </div>
-              <p>{project.description}</p>
-              <div className="stack">
-                {project.stack.map(({ icon, label }) => (
-                  <span key={label}>
-                    <i className={icon}></i>
-                    {label}
-                  </span>
-                ))}
-              </div>
-              <div className="project-links">
-                <a href={project.github}>GitHub</a>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
+            </article>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

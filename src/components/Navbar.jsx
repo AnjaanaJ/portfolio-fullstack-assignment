@@ -5,8 +5,10 @@ const NAV_LINKS = [
   { href: '#about', label: 'About' },
   { href: '#skills', label: 'Skills' },
   { href: '#projects', label: 'Projects' },
+  { href: '#admin', label: 'Admin' },
   { href: '#blogs', label: 'Blogs' },
   { href: '#contact', label: 'Contact' },
+  
 ];
 
 export default function Navbar({ theme, toggleTheme }) {
