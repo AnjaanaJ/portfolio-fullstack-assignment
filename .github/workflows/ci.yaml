@@ -18,29 +18,27 @@ concurrency:
 
 jobs:
   validate:
-    name: Basic Portfolio Validation
+    name: Build & Validate React App
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Check Required Files Exist
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build React App
+        run: npm run build
+
+      - name: Check dist output exists
         run: |
-          echo "Checking core files..."
-
-          test -f index.html || (echo "Missing index.html" && exit 1)
-          test -f style.css || (echo "Missing style.css" && exit 1)
-          test -f script.js || (echo "Missing script.js" && exit 1)
-
-          echo "All required files exist"
-
-      - name: Basic HTML sanity check
-        run: |
-          grep -q "<html" index.html || (echo "index.html missing <html>" && exit 1)
-          grep -q "</html>" index.html || (echo "index.html missing closing tag" && exit 1)
-
-          echo "HTML structure looks OK"
-
-      - name: CI Passed
-        run: echo "Portfolio CI passed successfully"
+          echo "Checking build output..."
+          test -f dist/index.html && echo "✅ dist/index.html exists" || (echo "❌ dist/index.html missing" && exit 1)
+          echo "✅ Build validation passed"
