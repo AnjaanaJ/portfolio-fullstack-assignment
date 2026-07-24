@@ -65,14 +65,28 @@ export default function Admin() {
     };
 
     try {
+      let savedProject;
+
       if (editingId) {
-        await updateProject(editingId, projectData);
+        savedProject = await updateProject(editingId, projectData);
         setMessage("Project updated successfully.");
       } else {
-        await createProject(projectData);
+        savedProject = await createProject(projectData);
         setMessage("Project added successfully.");
       }
 
+      setProjects((currentProjects) =>
+        editingId
+          ? currentProjects.map((project) =>
+              project._id === editingId ? savedProject : project,
+            )
+          : [
+              savedProject,
+              ...currentProjects.filter(
+                (project) => project._id !== savedProject._id,
+              ),
+            ],
+      );
       setForm(EMPTY_FORM);
       setEditingId("");
       await loadProjects();

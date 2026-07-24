@@ -5,8 +5,7 @@ dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 const connectDB = async () => {
   if (!process.env.MONGODB_URI) {
-    console.warn("MongoDB not connected: MONGODB_URI is not set");
-    return false;
+    throw new Error("MONGODB_URI is not set");
   }
 
   try {
@@ -15,10 +14,10 @@ const connectDB = async () => {
     });
 
     console.log(`MongoDB connected: ${connection.connection.host}`);
-    return true;
+    return connection;
   } catch (error) {
     console.error(`MongoDB connection failed: ${error.message}`);
-    process.exit(1);
+    throw error;
   }
 };
 

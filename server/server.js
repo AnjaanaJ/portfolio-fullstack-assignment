@@ -5,7 +5,7 @@ import connectDB from "./config/db.js";
 import projectRoutes from "./routes/projectRoutes.js";
 
 dotenv.config();
-const databaseConnected = await connectDB();
+await connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,7 +19,7 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
     message: "Portfolio API is running",
-    database: databaseConnected ? "connected" : "disconnected",
+    database: "connected",
   });
 });
 
