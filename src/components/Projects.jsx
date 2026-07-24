@@ -39,9 +39,12 @@ export default function Projects() {
 
   useEffect(() => {
     const loadProjects = async () => {
+      setLoading(true);
+
       try {
         const data = await getProjects();
         setProjects(data);
+        setError("");
       } catch (requestError) {
         setError(requestError.message);
       } finally {

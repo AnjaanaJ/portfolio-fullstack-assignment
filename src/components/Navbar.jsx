@@ -30,8 +30,19 @@ export default function Navbar({ theme, toggleTheme }) {
       if (current) setActiveSection(current);
     }
 
+    function handleHashChange() {
+      const section = window.location.hash.slice(1);
+      if (section) setActiveSection(section);
+    }
+
+    handleScroll();
+    handleHashChange();
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('hashchange', handleHashChange);
+    };
   }, []);
 
   useEffect(() => {
